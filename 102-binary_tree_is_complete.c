@@ -1,92 +1,61 @@
 #include "binary_trees.h"
-#include <stdio.h>
 
 /**
- * binary_tree_is_leaf - verifica se un nodo è una foglia
- * @node: puntatore al nodo da verificare
+ * count_nodes - Conta i nodi all'interno di un albero
+ * @radice: Nodo radice
  *
- * Return: 1 se il nodo è una foglia, 0 altrimenti.
+ * Return: Numero di nodi
  */
-int binary_tree_is_leaf(const binary_tree_t *node)
+int count_nodes(binary_tree_t *radice)
 {
-	if (node != NULL && node->left == NULL && node->right == NULL)
-		return (1);
-	return (0);
+	if (!radice)
+		return (0);
+
+	return (1 + count_nodes(radice->left) + count_nodes(radice->right));
 }
 
 /**
- * binary_tree_height - calcola l'altezza di un albero binario
- * @tree: puntatore al nodo radice dell'albero di cui calcolare l'altezza
+ * is_complete - Verifica se un albero è completo
+ * @radice: Puntatore alla radice dell'albero
+ * @indice: Indice del nodo in valutazione
+ * @n: Numero totale di nodi
  *
- * Return: l'altezza dell'albero. Se tree è NULL, restituisci 0
+ * Return: 1 se l'albero è completo, 0 altrimenti
  */
-size_t binary_tree_height(const binary_tree_t *tree)
+int is_complete(binary_tree_t *radice, int indice, int n)
 {
-	size_t left, right;
-
-	if (tree == NULL)
+	if (!radice)
 		return (0);
-	left = binary_tree_height(tree->left);
-	right = binary_tree_height(tree->right);
-	if (left >= right)
-		return (1 + left);
-	return (1 + right);
+
+	if (indice >= n)
+		return (0);
+	if (!radice->left && !radice->right)
+		return (1);
+	if (radice->right && !radice->left)
+		return (0);
+	if (radice->left && !radice->right)
+		return (is_complete(radice->left, indice * 2 + 1, n));
+
+	return (is_complete(radice->left, indice * 2 + 1, n) &&
+		is_complete(radice->right, indice * 2 + 2, n));
 }
 
 /**
- * binary_tree_is_perfect - verifica se un albero binario è perfetto
- * @tree: puntatore al nodo radice dell'albero da verificare
+ * binary_tree_is_complete - Verifica se un albero binario è completo
+ * @albero: Puntatore alla radice dell'albero
  *
- * Return: 1 se è perfetto, 0 altrimenti. Se tree è NULL, restituisci 0
+ * Return: 1 se l'albero è completo, 0 altrimenti
  */
-int binary_tree_is_perfect(const binary_tree_t *tree)
+int binary_tree_is_complete(const binary_tree_t *albero)
 {
-	binary_tree_t *l, *r;
+	int nodi;
+	binary_tree_t *radice;
 
-	if (tree == NULL)
-		return (1);
-	l = tree->left;
-	r = tree->right;
-	if (binary_tree_is_leaf(tree))
-		return (1);
-	if (l == NULL || r == NULL)
+	if (!albero)
 		return (0);
-	if (binary_tree_height(l) == binary_tree_height(r))
-	{
-		if (binary_tree_is_perfect(l) && binary_tree_is_perfect(r))
-			return (1);
-	}
-	return (0);
-}
 
-/**
- * binary_tree_is_complete - verifica se un albero binario è completo
- * @tree: puntatore al nodo radice dell'albero da verificare
- *
- * Return: 1 se è completo, 0 altrimenti. Se tree è NULL, restituisci 0
- */
-int binary_tree_is_complete(const binary_tree_t *tree)
-{
-	size_t l_height, r_height;
-	binary_tree_t *l, *r;
+	radice = (binary_tree_t *)albero;
+	nodi = count_nodes(radice);
 
-	if (tree == NULL)
-		return (0);
-	if (binary_tree_is_leaf(tree))
-		return (1);
-	l = tree->left;
-	r = tree->right;
-	l_height = binary_tree_height(l);
-	r_height = binary_tree_height(r);
-	if (l_height == r_height)
-	{
-		if (binary_tree_is_perfect(l) && binary_tree_is_complete(r))
-			return (1);
-	}
-	else if (l_height == r_height + 1)
-	{
-		if (binary_tree_is_complete(l) && binary_tree_is_perfect(r))
-			return (1);
-	}
-	return (0);
+	return (is_complete(radice, 0, nodi));
 }
