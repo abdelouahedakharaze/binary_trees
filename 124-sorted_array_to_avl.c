@@ -1,48 +1,42 @@
 #include "binary_trees.h"
 
 /**
- * sorted_array_to_avl_recursive - conversione ricorsiva di un array in AVL
- *
- * @array: puntatore all'array
- * @first_index: indice iniziale della sotto-array
- * @final_index: indice finale della sotto-array
- * Return: puntatore alla radice
+ * aux_sort - Crea l'albero utilizzando l'elemento centrale dell'array
+ * @parent: Nodo padre del nodo da creare
+ * @array: Array ordinato
+ * @begin: Posizione iniziale dell'array
+ * @last: Posizione finale dell'array
+ * Return: Albero creato
  */
-avl_t *sorted_array_to_avl_recursive(int *array, int first_index,
-int final_index)
+avl_t *aux_sort(avl_t *parent, int *array, int begin, int last)
 {
     avl_t *root;
-    int half;
+    binary_tree_t *aux;
+    int mid = 0;
 
-    if (final_index < first_index)
-        return (NULL);
-
-    half = (final_index + first_index) / 2;
-    /* creazione dell'albero binario con radice = half */
-    root = binary_tree_node(NULL, array[half]);
-    if (!root)
-        return (NULL);
-    /* ordinamento di ogni ramo */
-    root->left = sorted_array_to_avl_recursive(array, first_index, half - 1);
-    root->right = sorted_array_to_avl_recursive(array, half + 1, final_index);
-    if (root->left)
-        root->left->parent = root;
-    if (root->right)
-        root->right->parent = root;
-    return (root);
+    if (begin <= last)
+    {
+        mid = (begin + last) / 2;
+        aux = binary_tree_node((binary_tree_t *)parent, array[mid]);
+        if (aux == NULL)
+            return (NULL);
+        root = (avl_t *)aux;
+        root->left = aux_sort(root, array, begin, mid - 1);
+        root->right = aux_sort(root, array, mid + 1, last);
+        return (root);
+    }
+    return (NULL);
 }
 
 /**
- * sorted_array_to_avl - costruisce un albero AVL da un array
- *
- * @array: puntatore al primo elemento dell'array da convertire
- * @size: numero di elementi nell'array
- * Return: puntatore alla radice dell'albero AVL creato
- * o NULL in caso di errore
+ * sorted_array_to_avl - Crea un albero AVL da un array ordinato
+ * @array: Array ordinato
+ * @size: Dimensione dell'array ordinato
+ * Return: Albero AVL creato dall'array ordinato
  */
 avl_t *sorted_array_to_avl(int *array, size_t size)
 {
-    if (!array || size < 1)
+    if (array == NULL || size == 0)
         return (NULL);
-    return (sorted_array_to_avl_recursive(array, 0, size - 1));
+    return (aux_sort(NULL, array, 0, ((int)(size)) - 1));
 }
