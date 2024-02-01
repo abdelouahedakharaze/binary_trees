@@ -1,69 +1,38 @@
 #include "binary_trees.h"
-#include <stdio.h>
 
 /**
- * is_greater_than - check if all values in the tree are greater than a value
- * @tree: pointer to the tree to check
- * @val: value to check against
+ * isBST - Confronta il nodo per verificare se è un dato
  *
- * Return: 1 if true, 0 if false
+ * @albero: puntatore al nodo radice dell'albero da controllare
+ * @min: valore minimo
+ * @max: valore massimo
+ *
+ * Return: 1 se ha successo, 0 altrimenti
  */
-int is_greater_than(const binary_tree_t *tree, int val)
+int isBST(const binary_tree_t *albero, int min, int max)
 {
-	int left, right;
-
-	if (tree == NULL)
+	if (albero == NULL)
 		return (1);
-	if (tree->n > val)
-	{
-		left = is_greater_than(tree->left, val);
-		right = is_greater_than(tree->right, val);
-		if (left && right)
-			return (1);
-	}
-	return (0);
-}
 
-/**
- * is_less_than - check if all values in the tree are less than a specific value
- * @tree: pointer to the tree to check
- * @val: value to check against
- *
- * Return: 1 if true, 0 if false
- */
-int is_less_than(const binary_tree_t *tree, int val)
-{
-	int left, right;
-
-	if (tree == NULL)
-		return (1);
-	if (tree->n < val)
-	{
-		left = is_less_than(tree->left, val);
-		right = is_less_than(tree->right, val);
-		if (left && right)
-			return (1);
-	}
-	return (0);
-}
-
-/**
- * binary_tree_is_bst - checks if a binary tree is a valid binary search tree
- * @tree: pointer to the root node of the tree to check
- *
- * Return: 1 if tree is a valid BST, and 0 otherwise. If tree is NULL, return 0
- */
-int binary_tree_is_bst(const binary_tree_t *tree)
-{
-	if (tree == NULL)
+	if (albero->n < min || albero->n > max)
 		return (0);
-	if (is_less_than(tree->left, tree->n) && is_greater_than(tree->right, tree->n))
-	{
-		if (!tree->left || binary_tree_is_bst(tree->left))
-		{
-			if (!tree->right || binary_tree_is_bst(tree->right))
-				return (1);
-		}
-	}
-	return (0);
+
+	return (
+		isBST(albero->left, min, albero->n - 1) &&
+		isBST(albero->right, albero->n + 1, max)
+	);
+}
+
+/**
+ * binary_tree_is_bst - verifica se un albero binario è un valido albero di ricerca binario
+ *
+ * @albero: puntatore al nodo radice dell'albero da controllare
+ * Return: 1 se ha successo, 0 altrimenti
+ */
+int binary_tree_is_bst(const binary_tree_t *albero)
+{
+	if (albero == NULL)
+		return (0);
+
+	return (isBST(albero, INT_MIN, INT_MAX));
 }
