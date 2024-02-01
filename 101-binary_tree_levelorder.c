@@ -1,60 +1,69 @@
 #include "binary_trees.h"
 
 /**
- * binary_tree_height - Calcola l'altezza di un albero binario
- * @tree: puntatore al nodo radice dell'albero di cui calcolare l'altezza
- *
- * Return: l'altezza dell'albero. Se tree è NULL, restituisce 0
+ * binary_tree_height_aux - Calcola l'altezza di un albero
+ * @albero: Puntatore all'albero
+ * Return: Altezza dell'albero
  */
-size_t binary_tree_height(const binary_tree_t *tree)
+size_t binary_tree_height_aux(const binary_tree_t *albero)
 {
-	size_t left, right;
+	size_t hsinistra = 0, hdestra = 0;
 
-	if (tree == NULL)
+	if (!albero)
 		return (0);
-	left = binary_tree_height(tree->left);
-	right = binary_tree_height(tree->right);
-	if (left >= right)
-		return (1 + left);
-	return (1 + right);
+
+	if (albero->left)
+		hsinistra = 1 + binary_tree_height_aux(albero->left);
+
+	if (albero->right)
+		hdestra = 1 + binary_tree_height_aux(albero->right);
+
+	if (hsinistra > hdestra)
+		return (hsinistra);
+
+	return (hdestra);
 }
 
 /**
- * binary_tree_level - Esegue una funzione su un livello specifico di un albero binario
- * @tree: puntatore alla radice dell'albero
- * @level: livello dell'albero su cui eseguire la funzione
- * @func: funzione da eseguire
- *
+ * print_level_order - Stampa ogni nodo di un dato livello
+ * @albero: Puntatore all'albero
+ * @livello: Livello dell'albero
+ * @func: Puntatore a una funzione per ciascun nodo
  * Return: void
  */
-void binary_tree_level(const binary_tree_t *tree, size_t level, void (*func)(int))
+void print_level_order(const binary_tree_t *albero, int livello, void (*func)(int))
 {
-	if (tree == NULL)
+	if (!albero)
 		return;
-	if (level == 1)
-		func(tree->n);
-	else if (level > 1)
+
+	if (livello == 1)
+		func(albero->n);
+	else if (livello > 1)
 	{
-		binary_tree_level(tree->left, level - 1, func);
-		binary_tree_level(tree->right, level - 1, func);
+		print_level_order(albero->left, livello - 1, func);
+		print_level_order(albero->right, livello - 1, func);
 	}
 }
 
 /**
- * binary_tree_levelorder - Attraversa un albero binario usando la visita
- * @tree: puntatore al nodo radice dell'albero da attraversare
- * @func: puntatore a una funzione da chiamare per ogni nodo.
- * Il valore nel nodo deve essere passato come parametro a questa funzione
- *
+ * binary_tree_levelorder - Attraversamento di un albero in ampiezza
+ * @albero: Puntatore al nodo radice dell'albero da attraversare
+ * @func: Puntatore a una funzione da chiamare per ogni nodo
  * Return: void
  */
-void binary_tree_levelorder(const binary_tree_t *tree, void (*func)(int))
+void binary_tree_levelorder(const binary_tree_t *albero, void (*func)(int))
 {
-	size_t height, i;
+	int altezza = 0;
+	int lunghezza = 1;
 
-	if (tree == NULL || func == NULL)
+	if (!albero || !func)
 		return;
-	height = binary_tree_height(tree);
-	for (i = 1; i <= height; i++)
-		binary_tree_level(tree, i, func);
+
+	altezza = binary_tree_height_aux(albero) + 1;
+
+	while (lunghezza <= altezza)
+	{
+		print_level_order(albero, lunghezza, func);
+		lunghezza++;
+	}
 }
